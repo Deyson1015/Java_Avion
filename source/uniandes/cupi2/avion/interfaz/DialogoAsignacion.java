@@ -175,87 +175,79 @@ public class DialogoAsignacion extends JDialog implements ActionListener
      * <b>post: </b> Si el pasajero no está registrado y hay silla con las características solicitadas se asigna el pasajero a una silla del avión. <br>
      * Si el registro no se puede hacer correctamente, muestra un mensaje.
      */
-    public void registrar( )
-    {
-         Clase clase;
+    public void registrar() {
+        Clase clase;
         Ubicacion ubicacion;
         String nombre;
         String cedula;
         Pasajero pasajero;
 
-        nombre = txtNombre.getText( );
-        cedula = txtCedula.getText( );
+        nombre = txtNombre.getText().trim();
+        cedula = txtCedula.getText().trim();
 
-        if( cedula == null || cedula.equals( "" ) )
-        {
-            JOptionPane.showMessageDialog( this, "La cédula es requerida", "Registro", JOptionPane.ERROR_MESSAGE );
-        }
-        else
-        {
-           
-                if( nombre == null || nombre.equals( "" ) )
-                {
-                    JOptionPane.showMessageDialog( this, "El nombre es requerido", "Registro", JOptionPane.ERROR_MESSAGE );
-                }
-                else
-                {
-                    // Crea al pasajero
-                    pasajero = new Pasajero( cedula, nombre );
-
-                    // Verifica que no este ya el pasajero registrado
-                    Silla silla = avion.buscarPasajero( pasajero );
-
-                    if( silla != null )
-                    {
-                        JOptionPane.showMessageDialog( this, "El pasajero ya tiene una silla asignada", "Registro", JOptionPane.ERROR_MESSAGE );
-                    }
-                    else
-                    {
-                        // Registra al pasajero
-                        String sClase = ( String )cbClase.getSelectedItem( );
-                        if( sClase.equals( CLASE_EJECUTIVA ) )
-                        {
-                            clase = Clase.EJECUTIVA;
-                        }
-                        else
-                        {
-                            clase = Clase.ECONOMICA;
-                        }
-
-                        String sUbicacion = ( String )cbUbicacion.getSelectedItem( );
-                        if( sUbicacion.equals( UBICACION_VENTANA ) )
-                        {
-                            ubicacion = Ubicacion.VENTANA;
-                        }
-                        else if( sUbicacion.equals( UBICACION_PASILLO ) )
-                        {
-                            ubicacion = Ubicacion.PASILLO;
-                        }
-                        else
-                        {
-                            ubicacion = Ubicacion.CENTRAL;
-                        }
-
-                        silla = avion.asignarSilla( clase, ubicacion, pasajero );
-
-                        if( silla == null )
-                        {
-                            JOptionPane.showMessageDialog( this, "No hay sillas disponibles con dichas características", "Registro", JOptionPane.ERROR_MESSAGE );
-                        }
-                        else
-                        {
-                            principal.actualizar( );
-                            dispose( );
-                        }
-                    }
-
-                }
-
-            
-
+        // Validar que los campos no estén vacíos
+        if (cedula.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "La cédula es requerida", "Registro", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
+        if (!cedula.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "La cédula debe contener solo números", "Registro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (!cedula.matches("\\d{10}")) {
+        	JOptionPane.showMessageDialog(this, "La cedula debe tener exactamente 10 números", "Registro", JOptionPane.ERROR_MESSAGE);
+        }
+
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre es requerido", "Registro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\\s]+")) {
+            JOptionPane.showMessageDialog(this, "El nombre no debe contener números", "Registro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Crear pasajero
+        pasajero = new Pasajero(cedula, nombre);
+
+        // Verificar si ya tiene silla
+        Silla silla = avion.buscarPasajero(pasajero);
+        if (silla != null) {
+            JOptionPane.showMessageDialog(this, "El pasajero ya tiene una silla asignada", "Registro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtener clase
+        String sClase = (String) cbClase.getSelectedItem();
+        if (sClase.equals(CLASE_EJECUTIVA)) {
+            clase = Clase.EJECUTIVA;
+        } else {
+            clase = Clase.ECONOMICA;
+        }
+
+        // Obtener ubicación
+        String sUbicacion = (String) cbUbicacion.getSelectedItem();
+        if (sUbicacion.equals(UBICACION_VENTANA)) {
+            ubicacion = Ubicacion.VENTANA;
+        } else if (sUbicacion.equals(UBICACION_PASILLO)) {
+            ubicacion = Ubicacion.PASILLO;
+        } else {
+            ubicacion = Ubicacion.CENTRAL;
+        }
+
+        // Asignar silla
+        silla = avion.asignarSilla(clase, ubicacion, pasajero);
+        if (silla == null) {
+            JOptionPane.showMessageDialog(this, "No hay sillas disponibles con dichas características", "Registro", JOptionPane.ERROR_MESSAGE);
+        } else {
+            principal.actualizar();
+            dispose();
+        }
     }
+
 
     /**
      * Inicializa el panel con los datos del pasajero.

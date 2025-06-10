@@ -46,6 +46,7 @@ public class Avion
      * Sillas de la clase económica del avión.
      */
     private Silla[] sillasEconomicas;
+    
 
     // -----------------------------------------------------------------
     // Constructores
@@ -64,7 +65,8 @@ public class Avion
 
         // Crea las sillas económicas
         sillasEconomicas = new Silla[SILLAS_ECONOMICAS];
-
+        
+       
         sillasEjecutivas[ 0 ] = new Silla( 1, Clase.EJECUTIVA, Ubicacion.VENTANA );
         sillasEjecutivas[ 1 ] = new Silla( 2, Clase.EJECUTIVA, Ubicacion.PASILLO );
         sillasEjecutivas[ 2 ] = new Silla( 3, Clase.EJECUTIVA, Ubicacion.PASILLO );
@@ -328,6 +330,32 @@ public class Avion
     {
         return sillasEconomicas;
     }
+    
+    public int darClaseConMasSillasEnVentanaOcupadas( )
+    {
+        for (int i = 0; i < SILLAS_ECONOMICAS; i++) {
+            Silla silla = sillasEconomicas[i];
+            if (!silla.sillaAsignada() && silla.darUbicacion() == Ubicacion.VENTANA) {
+                return silla.darNumero();
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * Devuelve la primera silla económica libre que esté ubicada en la ventana.
+     * @return Silla económica libre en ventana o null si no hay.
+     */
+    public Silla darSillaEconomicaLibreEnVentana( ) {
+        for( int i = 0; i < SILLAS_ECONOMICAS; i++ ) {
+            Silla silla = sillasEconomicas[i];
+            if( !silla.sillaAsignada() && silla.darUbicacion() == Ubicacion.VENTANA ) {
+                return silla;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Método para la extensión 1.
@@ -335,16 +363,39 @@ public class Avion
      */
     public String metodo1( )
     {
-        return "Respuesta 1";
-    }
+        int ejecutiva = 0, economica = 0;
 
+        for (Silla s : sillasEjecutivas) {
+            if (s.sillaAsignada() && Silla.Ubicacion.VENTANA.equals(s.darUbicacion())) { // Use enum directly
+                if (Silla.Clase.EJECUTIVA.equals(s.darClase())) ejecutiva++;
+                
+            }
+        }
+
+        
+        for (Silla s : sillasEconomicas) {
+            if (s.sillaAsignada() && Silla.Ubicacion.VENTANA.equals(s.darUbicacion())) { // Use enum directly
+                if (Silla.Clase.ECONOMICA.equals(s.darClase())) economica++;
+                
+            }
+        }
+
+        return ejecutiva > economica ? "Hay más sillas ocupadas ubicadas en la ventana en la clase ejecutiva."
+             : economica > ejecutiva ? "Hay más sillas ocupadas ubicadas en la ventana en la clase económica."
+             : "Hay un número igual de sillas ocupadas en la ventana.";
+    }
+    
     /**
-     * Método para la extensión 2.
-     * @return Respuesta 2.
+     * Método que informa si hay una silla económica libre en la ventana.
+     * @return Mensaje con el resultado de la búsqueda.
      */
-    public String metodo2( )
-    {
-        return "Respuesta 2";
+    public String metodo2( ) {
+        Silla silla = darSillaEconomicaLibreEnVentana();
+        if( silla != null ) {
+            return "Si hay una silla económica gratuita en la ventana. El número de la silla es " + silla.darNumero();
+        } else {
+            return "No hay silla económica libre en la ventana.";
+        }
     }
 
 }
